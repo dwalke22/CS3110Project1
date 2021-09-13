@@ -63,7 +63,7 @@ public class CodePoint {
 		} 
 		else {
 			return String.format("%02X", parsed);
-		} ;
+		}
 	}
 	
 	/**
