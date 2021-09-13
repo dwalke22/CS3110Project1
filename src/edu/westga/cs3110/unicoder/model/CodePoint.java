@@ -8,6 +8,7 @@ package edu.westga.cs3110.unicoder.model;
  */
 public class CodePoint {
 
+	private String codepoint;
 	
 	/**
 	 * Creates a new Codepoint
@@ -17,8 +18,19 @@ public class CodePoint {
 	 * 
 	 * @postcondition none
 	 */
-	public CodePoint() {
+	public CodePoint(String codepoint) {
+		if (codepoint == null) {
+			throw new NullPointerException("Codepoint cannot be null.");
+		}
+		if (codepoint.isEmpty()) {
+			throw new IllegalArgumentException("Codepoint cannot be empty.");
+		}
 		
+		if (!codepoint.matches("0*((1[0-9A-F]{1,5})|([0-9A-F]{1,5}))")) {
+			throw new IllegalArgumentException("Codepoint is not in the proper formatt.");
+		}
+		
+		this.codepoint = codepoint;
 	}
 	
 	/**
