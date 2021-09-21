@@ -43,27 +43,24 @@ public class CodePoint {
 	 */
 	public String toUTF8() {
 		int parsed = Integer.parseUnsignedInt(this.codepoint, 16);
-		if (parsed > 0x007f && parsed < 0x0800) {
-			int upperBits = 0b11000000 + ((parsed & 0b11111000000 >> 6));
-			int lowerBits = 0b10000000 + (parsed & 0b00000111111);
-			return String.format("%04X", (upperBits<< 8) + lowerBits);
-		}
-		else if (parsed > 0x07FF && parsed < 0x10000) {
-			int upperBits = 0b11100000 + ((parsed & 0b1111000000000000) >> 12);
-			int middleBits = 0b10000000 + ((parsed & 0b0000111111000000) >> 6);
-			int lowerBits = 0b10000000 + (parsed & 0b0000000000111111);
-			return String.format("%06X", (upperBits << 16) + (middleBits << 8) + lowerBits);
-		}
-		else if (parsed > 0xFFFF) {
+		if (parsed > 0x007F && parsed < 0x0800) {
+			int byteOne = 0b11000000 + ((parsed & 0b11111000000) >> 6);
+			int byteTwo = 0b10000000 + (parsed & 0b00000111111);
+			return String.format("%04X", (byteOne << 8) + byteTwo);
+		} else if (parsed > 0x07FF && parsed < 0x10000) {
+			int byteOne = 0b11100000 + ((parsed & 0b1111000000000000) >> 12);
+			int byteTwo = 0b10000000 + ((parsed & 0b0000111111000000) >> 6);
+			int byteThree = 0b10000000 + (parsed & 0b0000000000111111);
+			return String.format("%06X", (byteOne << 16) + (byteTwo << 8) + byteThree);
+		} else if (parsed > 0xFFFF) {
 			int byteOne = 0b11110000 + ((parsed & 0b111000000000000000000) >> 18);
 			int byteTwo = 0b10000000 + ((parsed & 0b000111111000000000000) >> 12);
 			int byteThree = 0b10000000 + ((parsed & 0b000000000111111000000) >> 6);
 			int byteFour = 0b10000000 + (parsed & 0b000000000000000111111);
 			return String.format("%08X", (byteOne << 24) + (byteTwo << 16) + (byteThree << 8) + byteFour);
-		} 
-		else {
+		} else {
 			return String.format("%02X", parsed);
-		}
+		} 
 	}
 	
 	/**
@@ -75,7 +72,19 @@ public class CodePoint {
 	 * @return Encoding hexadecimal string as UTF-16 encoding
 	 */
 	public String toUTF16() {
-		return "";
+		int parsed = Integer.parseUnsignedInt(this.codepoint, 16);
+		if (parsed < 0x10000) {
+			if (parsed > 0xD7FF && parsed < 0xE000) {
+				return null;
+			} else {
+				return String.format("%04X", parsed);
+			}
+		} else {
+			parsed -= 0x10000;
+			int highSurrogate = 0xD800 + (parsed >> 10);
+			int lowSurrogate = 0xDC00 + (parsed & 0b00000000001111111111);
+			return String.format("%04X", highSurrogate) + String.format("%04X", lowSurrogate);
+		}
 	}
 	
 	/**
