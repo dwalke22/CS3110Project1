@@ -96,6 +96,7 @@ public class CodePoint {
 	 * @return Encoding hexadecimal string as UTF-32 encoding
 	 */
 	public String toUTF32() {
-		return "";
+		int parsed = Integer.parseUnsignedInt(this.codepoint, 16);
+		return String.format("%08X", parsed);
 	}
 }
